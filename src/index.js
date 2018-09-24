@@ -45,7 +45,11 @@ function wrapGetTemplate (env, dependencies) {
             const originalCallback = cb
             const wrapper = (err, result) => {
                 if (!err) {
-                    dependencies.push({ name, parent, path: result.path })
+                    dependencies.push({
+                        name,
+                        parent: parent || null,
+                        path: result.path,
+                    })
                 }
 
                 return originalCallback(err, result)
@@ -57,7 +61,11 @@ function wrapGetTemplate (env, dependencies) {
         const result = oldGetTemplate.apply(this, args)
 
         if (!cb) {
-            dependencies.push({ name, parent, path: result.path })
+            dependencies.push({
+                name,
+                parent: parent || null,
+                path: result.path,
+            })
         }
 
         return result
