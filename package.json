@@ -4,16 +4,15 @@
     "description": "Extract dependencies and other metadata from nunjucks templates",
     "main": "dist/index.js",
     "scripts": {
-        "build:dev": "shx mkdir -p ./dist && babel -o dist/index.js src/index.js",
-        "build": "cross-env NODE_ENV=production npm run build:dev",
+        "build": "shx mkdir -p ./dist && babel -o dist/index.js src/index.js",
+        "build:dev": "cross-env NODE_ENV=development npm run build",
         "clean": "shx rm -rf ./dist",
-        "prepublishOnly": "npm run clean && cross-env NODE_ENV=production npm run test",
+        "prepublishOnly": "npm run clean && cross-env NODE_ENV=production npm run build",
         "test": "npm run build:dev && ava --verbose ./test"
     },
     "repository": "chocolateboy/nunjucks-parser",
     "author": "chocolateboy",
     "license": "Artistic-2.0",
-    "private": true,
     "files": [
         "dist/index.js"
     ],
@@ -41,8 +40,10 @@
         "metadata",
         "parse",
         "parser",
+        "query",
         "render",
-        "template"
+        "template",
+        "templates"
     ],
     "peerDependencies": {
         "nunjucks": "^3.1.3"

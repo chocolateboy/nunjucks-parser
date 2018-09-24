@@ -39,7 +39,7 @@ nunjucks-parser - extract dependencies and other metadata from nunjucks template
 
 ### layout.html
 
-```xml
+```jinja
 {% include "components/header.html" %}
 <h1>Body</h1>
 {% include "components/footer.html" %}
@@ -53,7 +53,7 @@ nunjucks-parser - extract dependencies and other metadata from nunjucks template
 
 ### footer.html
 
-```xml
+```jinja
 <h1>Footer</h1>
 {% include "./copyright.html" %}
 ```
@@ -115,14 +115,13 @@ also return more data than the `render` methods i.e.:
 
 - content (string): the rendered template string
 - template (Template): the [Template](https://mozilla.github.io/nunjucks/api.html#template) instance used to render the template
-- dependencies (Array&lt;Object&gt;): an array of objects representing the direct and
-  transitive dependencies reachable from the template
+- dependencies (Array&lt;Object&gt;): an array of objects representing the direct and transitive dependencies referenced by the template
 
 Each dependency object contains the following fields:
 
 - name (string): the template's name as it appears in the source (may have been resolved to an absolute path/URI if it's relative)
-- parent (string|null): null if the dependency has no parent file; otherwise the resolved path of its parent file
-- path (string): the resolved path of this dependency (child template)
+- parent (string|null): the resolved path of the dependency's parent file, or null if it doesn't have one
+- path (string): the resolved path of the dependency (child template)
 
 ## Why?
 
@@ -154,7 +153,7 @@ nodes.printNodes(ast)
 
 ## parseFile
 
-**Signature**: parseFile(env: [Environment](https://mozilla.github.io/nunjucks/api.html#environment), templatePath: string, options?: Object) -> Promise&lt;Object&gt;
+**Signature**: parseFile(env: [Environment](https://mozilla.github.io/nunjucks/api.html#environment), templatePath: string, options?: Object) → Promise&lt;Object&gt;
 
 ```javascript
 const { content, template, dependencies } = await parseFile(env, templatePath, { data })
@@ -168,7 +167,7 @@ The following options are supported:
 
 ## parseString
 
-**Signature**: parseString(env: [Environment](https://mozilla.github.io/nunjucks/api.html#environment), src: string, options?: Object) -> Promise&lt;Object&gt;
+**Signature**: parseString(env: [Environment](https://mozilla.github.io/nunjucks/api.html#environment), src: string, options?: Object) → Promise&lt;Object&gt;
 
 ```javascript
 const { content, template, dependencies } = await parseString(env, src, { data, path })
@@ -183,7 +182,7 @@ The following options are supported:
 
 ## renderFile
 
-**Signature**: renderFile(env: [Environment](https://mozilla.github.io/nunjucks/api.html#environment), src: string, options?: Object) -> Promise&lt;Object&gt;
+**Signature**: renderFile(env: [Environment](https://mozilla.github.io/nunjucks/api.html#environment), src: string, options?: Object) → Promise&lt;Object&gt;
 
 ```javascript
 const { content, template } = await renderFile(env, src, { data })
@@ -198,7 +197,7 @@ The following options are supported:
 
 ## renderString
 
-**Signature**: renderString(env: [Environment](https://mozilla.github.io/nunjucks/api.html#environment), src: string, options?: Object) -> Promise&lt;Object&gt;
+**Signature**: renderString(env: [Environment](https://mozilla.github.io/nunjucks/api.html#environment), src: string, options?: Object) → Promise&lt;Object&gt;
 
 ```javascript
 const { content, template } = await renderString(env, src, { data })
@@ -210,6 +209,7 @@ as well as its rendered string (`content`).
 The following options are supported:
 
 - data (Object): an optional value to expose as the template's "context"
+- path (string): an optional path/URL for the template: used to resolve file-relative paths and for error reporting
 
 # DEVELOPMENT
 
@@ -237,6 +237,7 @@ This package is tested and supported on environments which meet the following re
 # SEE ALSO
 
 * [nunjucks](https://www.npmjs.com/package/nunjucks)
+* [parcel-plugin-nunjucks](https://www.npmjs.com/package/parcel-plugin-nunjucks)
 
 # VERSION
 

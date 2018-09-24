@@ -133,8 +133,8 @@ export async function renderString (env, src, _options) {
 // signature and internals of `getTemplate` but to any method it calls that
 // might lead to a nested `getTemplate` call. this solution is particularly
 // impractical for nunjucks since these calls may be baked into compiled code.
-// which can't be "upgraded" to support this new protocol of "thread local"
-// (i.e. per-method) state.
+// which can't be "upgraded" to support a new protocol for "thread local"
+// (i.e. per method-call) state.
 //
 // a better solution is to avoid concurrency/mutation altogether. we can do
 // this by creating a private clone of the Environment and calling `getTemplate`
@@ -162,7 +162,7 @@ export async function renderString (env, src, _options) {
 // original env.
 //
 // this suggests that we don't need an Environment#clone method after all
-// (which is just as well since nunjucks doesn't have one — yet [1]). Our
+// (which is just as well since nunjucks doesn't provide one — yet [1]). Our
 // temporary env is not so much a clone as a *shim*, an object that delegates
 // almost everything to its target. as of ES6, we have a built-in way to create
 // shims like this quickly and easily without waiting for a library to bless us
@@ -185,12 +185,18 @@ export async function renderString (env, src, _options) {
 async function parse (env, render, pathOrSource, options) {
     const dependencies = []
 
-    // empty handler: delegate everything to env apart from getTemplate
-    const proxy = new Proxy(env, {})
+    // empty handler: delegate everything to env apart from `getTemplate`
+    //
+    // XXX some Environment methods chain (e.g. `addFilter`, `addExtension` etc.).
+    // we're not intercepting those (to return the shim) because they're
+    // not called via any code path beneath `getTemplate` (in fact they're not
+    // called anywhere in the nunjucks codebase), but in theory they could be
+    // called e.g. via a callback
+    const shim = new Proxy(env, {})
 
-    proxy.getTemplate = wrapGetTemplate(env, dependencies)
+    shim.getTemplate = wrapGetTemplate(env, dependencies)
 
-    const result = await render(proxy, pathOrSource, options || {})
+    const result = await render(shim, pathOrSource, options || {})
 
     return { ...result, dependencies }
 }
