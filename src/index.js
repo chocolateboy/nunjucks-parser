@@ -142,7 +142,7 @@ export async function renderString (env, src, _options) {
 //
 // the "viral" nature of the hidden `this` parameter means the clone will
 // get passed down to nested `getTemplate` calls, which is just what we
-// want: things outside the bubble of encapuslation stay outside and things
+// want: things outside the bubble of encapsulation stay outside and things
 // inside the bubble stay inside.
 //
 // the only drawback with this approach is that we lose a lot of things

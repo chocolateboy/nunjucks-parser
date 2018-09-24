@@ -60,9 +60,14 @@ also return more data than the `render` methods i.e.:
 
 - content (string): the rendered template string
 - template (Template): the [Template](https://mozilla.github.io/nunjucks/api.html#template) instance used to render the template
-  source
 - dependencies (Array&lt;Object&gt;): an array of objects representing the direct and
-  transitive dependencies reachable from the parent template
+  transitive dependencies reachable from the template
+
+Each dependency object contains the following fields:
+
+- name (string): the template's name as it appears in the source (may have been resolved to an absolute path/URI if it's relative)
+- parent (string?): null if the dependency has no parent file; otherwise the resolved path of its parent file
+- path (string): the resolved path of this dependency (child template)
 
 ## Why?
 
@@ -94,18 +99,13 @@ nodes.printNodes(ast)
 
 ## parseFile
 
-**Signature**: parseFile(env: [Environment](https://mozilla.github.io/nunjucks/api.html#environment), templatePath: string, options: Object?) -> Promise&lt;Object&gt;
+**Signature**: parseFile(env: [Environment](https://mozilla.github.io/nunjucks/api.html#environment), templatePath: string, options?: Object) -> Promise&lt;Object&gt;
 
 ```javascript
-const { content, template, dependencies } = await parseFile(env, src, { data })
+const { content, template, dependencies } = await parseFile(env, templatePath, { data })
 ```
 
-An enhanced version of [renderFile](#renderFile) which augments its result with an array of objects representing the template's dependencies.
-Each dependency object contains the following fields:
-
-- name (string): the template's name as it appears in the source (may have been resolved to an absolute path/URI if it's relative)
-- parent (string?): null if the dependency has no parent file; otherwise the resolved path of its parent file
-- path (string): the resolved path of this dependency (child template)
+An enhanced version of [renderFile](#renderfile) which augments its result with an array of objects representing the template's dependencies.
 
 The following options are supported:
 
@@ -113,30 +113,25 @@ The following options are supported:
 
 ## parseString
 
-**Signature**: renderString(env: [Environment](https://mozilla.github.io/nunjucks/api.html#environment), src: string, options: Object) -> Promise&lt;Object&gt;
+**Signature**: parseString(env: [Environment](https://mozilla.github.io/nunjucks/api.html#environment), src: string, options?: Object) -> Promise&lt;Object&gt;
 
 ```javascript
-const { content, template, dependencies } = await parseFile(env, src, { data, path })
+const { content, template, dependencies } = await parseString(env, src, { data, path })
 ```
 
-An enhanced version of [renderFile](#renderfile) which augments its result with an array of objects representing the template's dependencies.
-Each dependency object contains the following fields:
-
-- name (string): the name for a template as it appears in the source (may have been resolved to an absolute path/URI if it's relative)
-- parent (string?): null if the dependency has no parent file; otherwise the resolved path of its parent file
-- path (string): the resolved path of this dependency (child template)
+An enhanced version of [renderString](#renderstring) which augments its result with an array of objects representing the template's dependencies.
 
 The following options are supported:
 
 - data (Object): an optional value to expose as the template's "context"
-- path (string?): an optional path/URL for the template: used to resolve file-relative paths and for error reporting
+- path (string): an optional path/URL for the template: used to resolve file-relative paths and for error reporting
 
 ## renderFile
 
-**Signature**: renderString(env: [Environment](https://mozilla.github.io/nunjucks/api.html#environment), src: string, options: Object) -> Promise&lt;Object&gt;
+**Signature**: renderFile(env: [Environment](https://mozilla.github.io/nunjucks/api.html#environment), src: string, options?: Object) -> Promise&lt;Object&gt;
 
 ```javascript
-const { content, template } = await renderString(env, src, { data })
+const { content, template } = await renderFile(env, src, { data })
 ```
 
 A promisified variant of [`Environment#render`](https://mozilla.github.io/nunjucks/api.html#render) which yields the resulting [Template](https://mozilla.github.io/nunjucks/api.html#template) object (`template`)
@@ -148,7 +143,7 @@ The following options are supported:
 
 ## renderString
 
-**Signature**: renderString(env: [Environment](https://mozilla.github.io/nunjucks/api.html#environment), src: string, options: Object) -> Promise&lt;Object&gt;
+**Signature**: renderString(env: [Environment](https://mozilla.github.io/nunjucks/api.html#environment), src: string, options?: Object) -> Promise&lt;Object&gt;
 
 ```javascript
 const { content, template } = await renderString(env, src, { data })
