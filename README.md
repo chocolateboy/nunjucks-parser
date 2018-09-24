@@ -37,15 +37,70 @@ nunjucks-parser - extract dependencies and other metadata from nunjucks template
 
 # SYNOPSIS
 
+### layout.html
+
+```xml
+{% include "components/header.html" %}
+<h1>Body</h1>
+{% include "components/footer.html" %}
+```
+
+### header.html
+
+```xml
+<h1>Header</h1>
+```
+
+### footer.html
+
+```xml
+<h1>Footer</h1>
+{% include "./copyright.html" %}
+```
+
+### copyright.html
+
+```xml
+Copyright ⓒ example.com 2018
+```
+
+### test.js
+
 ```javascript
 import nunjucks      from 'nunjucks'
 import { parseFile } from 'nunjucks-parser'
 
-const env = nunjucks.configure('src/html')
-const data = { foo: 42 }
-const { content, template, dependencies } = await parseFile(env, 'index.html.njk', { data })
+const env = nunjucks.configure('example')
+const { content, template, dependencies } = await parseFile(env, 'layout.html')
 
 console.log(dependencies)
+```
+
+### result
+
+```javascript
+[
+    {
+        name: "layout.html",
+        path: "/home/user/example/layout.html",
+        parent: null
+    },
+    {
+        name: "components/header.html",
+        path: "/home/user/example/components/header.html",
+        parent: "/home/user/example/layout.html"
+    },
+    {
+        name: "components/footer.html",
+        path: "/home/user/example/components/footer.html",
+        parent: "/home/user/example/layout.html"
+    },
+    {
+        name: "./copyright.html",
+        path: "/home/user/example/components/copyright.html",
+        parent: "/home/user/example/components/footer.html"
+    }
+]
 ```
 
 # DESCRIPTION
@@ -66,12 +121,12 @@ also return more data than the `render` methods i.e.:
 Each dependency object contains the following fields:
 
 - name (string): the template's name as it appears in the source (may have been resolved to an absolute path/URI if it's relative)
-- parent (string?): null if the dependency has no parent file; otherwise the resolved path of its parent file
+- parent (string|null): null if the dependency has no parent file; otherwise the resolved path of its parent file
 - path (string): the resolved path of this dependency (child template)
 
 ## Why?
 
-Bundlers such as [parcel](https://parceljs.org/) provide the ability to track the direct and transitive dependencies of
+Bundlers such as [Parcel](https://parceljs.org/) provide the ability to track the direct and transitive dependencies of
 assets so that changes to those dependencies trigger updates in their dependents. nunjucks doesn't provide a built-in
 way to do this, so this functionality must currently be done in a non-optimal way e.g. by monitoring every file in
 a directory that has an `.njk` extension.
