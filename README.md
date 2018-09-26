@@ -126,7 +126,7 @@ provide a built-in way to do this.
 
 This module provides a simple and efficient way to query this information without resorting to inefficient
 workarounds such as monitoring every file in a directory that has an `.njk` extension. It also provides
-promisified wrappers for the built-in `render` functions which fix nits and bypass
+promisified versions of the built-in `render` functions which fix nits and bypass
 [bugs](https://github.com/mozilla/nunjucks/issues/678) in the standard API.
 
 ## Why Not?
@@ -243,7 +243,7 @@ This package is tested and supported on environments which meet the following re
 
 # VERSION
 
-0.0.2
+0.0.3
 
 # AUTHOR
 

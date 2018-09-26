@@ -1,6 +1,6 @@
 {
     "name": "nunjucks-parser",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "description": "Extract dependencies from nunjucks templates",
     "main": "dist/index.js",
     "scripts": {

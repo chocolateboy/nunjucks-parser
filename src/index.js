@@ -195,14 +195,16 @@ async function parse (env, render, pathOrSource, options) {
 
     // we need to disable caching (by thread-locally clearing the cache) in order
     // to traverse all of the descendant files.
-    //
-    // despite environments having a noCache option, it's effectively ignored
-    // in nunjucks and all accesses are performed by reading from and writing to
-    // env.loader[*].cache, so we simulate a pristine (but still functional) cache
-    // by targeting a new thread-local store (a plain object) when the cache
-    // is read from or written to.
-    const cache = {}
     const fakeLoaders = env.loaders.map(loader => {
+        // despite environments having a noCache option, it's effectively ignored
+        // in nunjucks and all cache operations are performed by reading from and
+        // writing to env.loader[*].cache.
+        //
+        // we want the cache to be pristine (so it doesn't short circuit) but still
+        // functional (for dependencies which appear more than once), so we allocate
+        // an empty but writable store to each loader
+        const cache = {}
+
         return new Proxy(loader, {
             get (target, name, receiver) {
                 return (name === 'cache')
