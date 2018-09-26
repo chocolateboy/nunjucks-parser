@@ -1,3 +1,4 @@
+const uniqBy       = require('lodash.uniqby')
 const { Template } = require('nunjucks')
 const promisify    = require('pify')
 
@@ -26,7 +27,7 @@ const promisify    = require('pify')
 function wrapGetTemplate (env, dependencies) {
     const oldGetTemplate = env.getTemplate
 
-    // XXX everything here apart from the dependency push is copypasta from
+    // XXX everything here apart from the dependency signal is copypasta from
     // nunjucks.Environment (v3.x) and can go away if/when this data is exposed
     // by nunjucks e.g. via an event emitter:
     //
@@ -160,13 +161,10 @@ function renderString (env, src, _options) {
 // want: things outside the bubble of encapsulation stay outside and things
 // inside the bubble stay inside.
 //
-// the only drawback with this approach is that we lose a lot of things
-// from the original env that we don't need to jettison. the clone is immediately
-// discarded once we've harvested the dependencies, which means we miss out
-// on some side-effects which are actually beneficial such as caching. in fact
-// the only change we need to make to harvest dependencies is the addition of
-// the custom `getTemplate` method. everything else can be delegated to the
-// original env.
+// the only drawback with this approach is that we lose things from the original
+// env that we don't need to jettison. in order to harvest dependencies,
+// the only things we need to override are `getTemplate` and caching.
+// everything else can be delegated to the original env.
 //
 // this suggests that we don't need an Environment#clone method after all
 // (which is just as well since nunjucks doesn't provide one — yet [1]). Our
@@ -189,27 +187,22 @@ function renderString (env, src, _options) {
 // [2] https://github.com/mozilla/nunjucks/issues/1153
 
 // a private helper implementing code common to `parseFile` and `parseString`
-async function parse (env, render, pathOrSource, options) {
+async function parse (env, render, pathOrSource, _options) {
+    const options = _options || {}
     const dependencies = []
     const getTemplate = wrapGetTemplate(env, dependencies)
 
-    // we need to disable caching (by thread-locally clearing the cache) in order
-    // to traverse all of the descendant files.
+    // we need to disable caching (thread-locally) in order to traverse all of
+    // the descendant files.
     const fakeLoaders = env.loaders.map(loader => {
         // despite environments having a noCache option, it's effectively ignored
-        // in nunjucks and all cache operations are performed by reading from and
-        // writing to env.loader[*].cache.
-        //
-        // we want the cache to be pristine (so it doesn't short circuit) but still
-        // functional (for dependencies which appear more than once), so we allocate
-        // an empty but writable store to each loader
-        const cache = {}
-
+        // in nunjucks, and all cache operations are performed by reading from
+        // and writing to env.loader[*].cache. by intercepting this value, we can
+        // return false for all cache probes, ensuring dynamic dependencies
+        // are always reached
         return new Proxy(loader, {
             get (target, name, receiver) {
-                return (name === 'cache')
-                    ? cache
-                    : Reflect.get(target, name, receiver)
+                return (name === 'cache') ? {} : Reflect.get(target, name, receiver)
             }
         })
     })

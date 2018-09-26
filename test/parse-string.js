@@ -1,40 +1,36 @@
-import { parseString } from '..'
-import test        from 'ava'
-import { sprintf } from 'sprintf-js'
-
+import { parseString }                       from '..'
 import { cwd, env, layout, normalize, want } from './_helpers.js'
+import test                                  from 'ava'
+import { sprintf }                           from 'sprintf-js'
+
 const templatePath = cwd('example/layout.html')
 
 test('parseString (without data, without path)', async t => {
-    const result = await parseString(env, layout)
-    const content = normalize(result.content)
+    const result = await parseString(env.example, layout)
 
-    t.is(content, sprintf(want.content, 'world'))
-    t.deepEqual(result.dependencies, want.stringDependencies.withoutPath)
+    t.is(normalize(result.content), sprintf(want.content.example, 'world'))
+    t.deepEqual(result.dependencies, want.dependencies.string.noPath)
 })
 
 test('parseString (without data, with path)', async t => {
-    const result = await parseString(env, layout, { path: templatePath })
-    const content = normalize(result.content)
+    const result = await parseString(env.example, layout, { path: templatePath })
 
-    t.is(content, sprintf(want.content, 'world'))
-    t.deepEqual(result.dependencies, want.stringDependencies.withPath)
+    t.is(normalize(result.content), sprintf(want.content.example, 'world'))
+    t.deepEqual(result.dependencies, want.dependencies.string.path)
 })
 
 test('parseString (with data, without path)', async t => {
     const data = { name: 'nunjucks' }
-    const result = await parseString(env, layout, { data })
-    const content = normalize(result.content)
+    const result = await parseString(env.example, layout, { data })
 
-    t.is(content, sprintf(want.content, 'nunjucks'))
-    t.deepEqual(result.dependencies, want.stringDependencies.withoutPath)
+    t.is(normalize(result.content), sprintf(want.content.example, 'nunjucks'))
+    t.deepEqual(result.dependencies, want.dependencies.string.noPath)
 })
 
 test('parseString (with data, with path)', async t => {
     const data = { name: 'nunjucks' }
-    const result = await parseString(env, layout, { data, path: templatePath })
-    const content = normalize(result.content)
+    const result = await parseString(env.example, layout, { data, path: templatePath })
 
-    t.is(content, sprintf(want.content, 'nunjucks'))
-    t.deepEqual(result.dependencies, want.stringDependencies.withPath)
+    t.is(normalize(result.content), sprintf(want.content.example, 'nunjucks'))
+    t.deepEqual(result.dependencies, want.dependencies.string.path)
 })

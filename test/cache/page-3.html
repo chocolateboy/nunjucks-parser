@@ -1,0 +1,7 @@
+<h1>Page 3</h1>
+
+{% if branch.next().value == "lhs" %}
+    {%- include "page-4.html" %}
+{% else %}
+    {%- include "page-5.html" %}
+{% endif %}

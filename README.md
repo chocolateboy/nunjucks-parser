@@ -12,6 +12,9 @@
 - [DESCRIPTION](#description)
   - [Why?](#why)
   - [Why Not?](#why-not)
+- [TYPES](#types)
+  - [Dependency](#dependency)
+  - [Result](#result)
 - [EXPORTS](#exports)
   - [parseFile](#parsefile)
   - [parseString](#parsestring)
@@ -145,12 +148,40 @@ const ast = parser.parse(src)
 nodes.printNodes(ast)
 ```
 
+# TYPES
+
+The following types are referenced in the [exports](#exports) below.
+
+## Dependency
+
+```typescript
+type Dependency {
+    name: string,
+    path: string,
+    parent: string|null
+}
+```
+
+Each dependency object contains the following fields:
+
+- name: the dependency's name as it appears in the source
+- parent: the resolved path of the dependency's parent file or URI, or null if it doesn't have one
+- path: the dependency's absolute path or URI
+
+## Result
+
+```typescript
+type Result {
+    content: string,
+    dependencies: Array<Dependency>
+}
+```
+
 # EXPORTS
 
 ## parseFile
 
-**Signature**: parseFile(env: [Environment](https://mozilla.github.io/nunjucks/api.html#environment), templatePath: string, options?: Object) → Promise&lt;Result&gt;<br/>
-**Result**: { content: string, dependencies: { name: string, path: string, parent: string|null } }
+**Signature**: parseFile(env: [Environment](https://mozilla.github.io/nunjucks/api.html#environment), templatePath: string, options?: Object) → Promise&lt;[Result](#result)&gt;<br/>
 
 ```javascript
 const { content, dependencies } = await parseFile(env, templatePath, { data })
@@ -158,20 +189,45 @@ const { content, dependencies } = await parseFile(env, templatePath, { data })
 
 An enhanced version of [`renderFile`](#renderfile) which returns the template's dependencies as well as its rendered content.
 
-Each dependency object contains the following fields:
-
-- name: the dependency's name as it appears in the source
-- parent: the resolved path of the dependency's parent file or URI, or null if it doesn't have one
-- path: the dependency's absolute path or URI
-
 The following options are supported:
 
 - data (Object): an optional value to expose as the template's "context"
 
+Dependencies are returned in the order in which they're traversed — depth first — and all descendants
+are returned, including those that are loaded dynamically. For example, if page-3 in the following
+graph loads page-4 the first time it's loaded and page-5 the second time:
+
+                  index
+                 /      \
+                /        \
+               /          \
+              /            \
+           page-1        page-2
+             \              /
+              \            /
+               \          /
+                \        /
+                  page-3
+                 /      \
+                /        \
+               /          \
+              /            \
+             /              \
+            page-4      page-5
+
+\- its dependencies will be ordered as follows:
+
+    index -> page-1 -> page-3 -> page-4 -> page-2 -> page-3 -> page-5
+
+If deduplicated dependencies are needed, they can be distinguished by the `path` property e.g.:
+
+```javascript
+const deduped = _.uniqBy(dependencies, 'path')
+```
+
 ## parseString
 
-**Signature**: parseString(env: [Environment](https://mozilla.github.io/nunjucks/api.html#environment), src: string, options?: Object) → Promise&lt;Result&gt;<br />
-**Result**: { content: string, dependencies: { name: string, path: string, parent: string|null } }
+**Signature**: parseString(env: [Environment](https://mozilla.github.io/nunjucks/api.html#environment), src: string, options?: Object) → Promise&lt;[Result](#result)&gt;<br />
 
 ```javascript
 const { content, dependencies } = await parseString(env, src, { data, path })
@@ -179,16 +235,9 @@ const { content, dependencies } = await parseString(env, src, { data, path })
 
 An enhanced version of [`renderString`](#renderstring) which returns the template's dependencies as well as its rendered content.
 
-Each dependency object contains the following fields:
+In addition to the options supported by [`parseFile`](#parsefile), `parseString` also supports the following options:
 
-- name: the dependency's name as it appears in the source
-- parent: the resolved path of the dependency's parent file or URI, or null if it doesn't have one
-- path: the dependency's absolute path or URI
-
-The following options are supported:
-
-- data (Object): an optional value to expose as the template's "context"
-- path (string): an optional absolute path/URI for the template: used to resolve relative paths and for error reporting
+- path (string): the optional absolute path/URI of the template: used to resolve relative paths and for error reporting
 
 ## renderFile
 
@@ -208,10 +257,9 @@ The following options are supported:
 A version of [`Environment#renderString`](https://mozilla.github.io/nunjucks/api.html#renderstring) which is (always)
 async and which is passed its context and path via an options object.
 
-The following options are supported:
+In addition to the options supported by [`renderFile`](#renderfile), `renderString` also supports the following options:
 
-- data (Object): an optional value to expose as the template's "context"
-- path (string): an optional absolute path/URI for the template: used to resolve relative paths and for error reporting
+- path (string): the optional absolute path/URI of the template: used to resolve relative paths and for error reporting
 
 # DEVELOPMENT
 

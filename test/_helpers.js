@@ -18,20 +18,44 @@ function normalize (html) {
     return html.replace(/\n{2,}/g, "\n")
 }
 
-const templateDir = cwd('./example')
-const env = Nunjucks.configure(templateDir)
-const content = Fs.readFileSync(cwd('fixtures/content.html'), 'utf8')
-const fileDependencies = cwd.require('fixtures/dependencies/file.js')(templateDir)
-const stringWithPathDependencies = cwd.require('fixtures/dependencies/string-with-path.js')(templateDir)
-const stringWithoutPathDependencies = cwd.require('fixtures/dependencies/string-without-path.js')(templateDir)
+const cacheDir = cwd('./cache')
+const exampleDir = cwd('./example')
+
+const cacheContentLhs = Fs.readFileSync(cwd('fixtures/content/cache-lhs.html'), 'utf8')
+const cacheContentRhs = Fs.readFileSync(cwd('fixtures/content/cache-rhs.html'), 'utf8')
+const cacheDependenciesLhs = cwd.require('fixtures/dependencies/cache-lhs.js')(cacheDir)
+const cacheDependenciesRhs = cwd.require('fixtures/dependencies/cache-rhs.js')(cacheDir)
+const cacheEnv = Nunjucks.configure(cacheDir)
+const exampleContent = Fs.readFileSync(cwd('fixtures/content/example.html'), 'utf8')
+const exampleEnv = Nunjucks.configure(exampleDir)
+const fileDependencies = cwd.require('fixtures/dependencies/file.js')(exampleDir)
 const layout = Fs.readFileSync(cwd('example/layout.html'), 'utf8')
-const want = {
-    content,
-    fileDependencies,
-    stringDependencies: {
-        withPath: stringWithPathDependencies,
-        withoutPath: stringWithoutPathDependencies,
+const stringWithoutPathDependencies = cwd.require('fixtures/dependencies/string-without-path.js')(exampleDir)
+const stringWithPathDependencies = cwd.require('fixtures/dependencies/string-with-path.js')(exampleDir)
+
+const dependencies = {
+    cache: {
+        lhs: cacheDependenciesLhs,
+        rhs: cacheDependenciesRhs,
+    },
+    file: fileDependencies,
+    string: {
+        path: stringWithPathDependencies,
+        noPath: stringWithoutPathDependencies,
     }
+}
+
+const env = { example: exampleEnv, cache: cacheEnv }
+
+const want = {
+    content: {
+        example: exampleContent,
+        cache: {
+            lhs: cacheContentLhs,
+            rhs: cacheContentRhs,
+        }
+    },
+    dependencies,
 }
 
 export { cwd, env, layout, normalize, want }
