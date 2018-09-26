@@ -1,13 +1,13 @@
 {
     "name": "nunjucks-parser",
     "version": "0.0.1",
-    "description": "Extract dependencies and other metadata from nunjucks templates",
+    "description": "Extract dependencies from nunjucks templates",
     "main": "dist/index.js",
     "scripts": {
         "build": "shx mkdir -p ./dist && babel -o dist/index.js src/index.js",
         "build:dev": "cross-env NODE_ENV=development npm run build",
         "clean": "shx rm -rf ./dist",
-        "prepublishOnly": "npm run clean && cross-env NODE_ENV=production npm run build",
+        "prepublishOnly": "npm run clean && cross-env NODE_ENV=production npm run test",
         "test": "npm run build:dev && ava --verbose ./test"
     },
     "repository": "chocolateboy/nunjucks-parser",
@@ -28,16 +28,19 @@
         "ava": "1.0.0-beta.4",
         "cross-env": "^5.2.0",
         "nunjucks": "^3.1.3",
-        "shx": "^0.3.2"
+        "shx": "^0.3.2",
+        "sprintf-js": "^1.1.1"
     },
     "keywords": [
-        "nunjucks",
         "bundle",
         "bundler",
         "dependencies",
         "dependency",
         "extract",
         "metadata",
+        "nunjucks",
+        "parcel",
+        "parcel-bundler",
         "parse",
         "parser",
         "query",

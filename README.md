@@ -29,11 +29,12 @@
 
 # NAME
 
-nunjucks-parser - extract dependencies and other metadata from nunjucks templates
+nunjucks-parser - extract dependencies from nunjucks templates
 
 # INSTALLATION
 
-    $ npm install nunjucks nunjucks-parser
+    $ npm install nunjucks # peer dependency
+    $ npm install nunjucks-parser
 
 # SYNOPSIS
 
@@ -55,12 +56,12 @@ nunjucks-parser - extract dependencies and other metadata from nunjucks template
 
 ```jinja
 <h1>Footer</h1>
-{% include "./copyright.html" %}
+{% include "./copyright.txt" %}
 ```
 
-### copyright.html
+### copyright.txt
 
-```xml
+```
 Copyright ⓒ example.com 2018
 ```
 
@@ -71,7 +72,7 @@ import nunjucks      from 'nunjucks'
 import { parseFile } from 'nunjucks-parser'
 
 const env = nunjucks.configure('example')
-const { content, template, dependencies } = await parseFile(env, 'layout.html')
+const { content, dependencies } = await parseFile(env, 'layout.html')
 
 console.log(dependencies)
 ```
@@ -96,8 +97,8 @@ console.log(dependencies)
         parent: "/home/user/example/layout.html"
     },
     {
-        name: "./copyright.html",
-        path: "/home/user/example/components/copyright.html",
+        name: "./copyright.txt",
+        path: "/home/user/example/components/copyright.txt",
         parent: "/home/user/example/components/footer.html"
     }
 ]
@@ -105,39 +106,27 @@ console.log(dependencies)
 
 # DESCRIPTION
 
-This module exports a pair of [nunjucks](https://mozilla.github.io/nunjucks/) helper functions,
-[`parseFile`](#parsefile) and [`parseString`](#parsestring), which function like enhanced versions of the built-in [`Environment#render`](https://mozilla.github.io/nunjucks/api.html#render)
-and [`Environment#renderString`](https://mozilla.github.io/nunjucks/api.html#renderstring) methods.
-
-In addition to always returning promises — which, amongst other things, sidesteps a bug in the synchronous
-API which [silently swallows errors](https://github.com/mozilla/nunjucks/issues/678) — these methods
-also return more data than the `render` methods i.e.:
-
-- content (string): the rendered template string
-- template (Template): the [Template](https://mozilla.github.io/nunjucks/api.html#template) instance used to render the template
-- dependencies (Array&lt;Object&gt;): an array of objects representing the direct and transitive dependencies referenced by the template
-
-Each dependency object contains the following fields:
-
-- name (string): the template's name as it appears in the source (may have been resolved to an absolute path/URI if it's relative)
-- parent (string|null): the resolved path of the dependency's parent file, or null if it doesn't have one
-- path (string): the resolved path of the dependency (child template)
+This module exports [nunjucks](https://mozilla.github.io/nunjucks/) helper functions which simplify
+the use of the built-in [`Environment#render`](https://mozilla.github.io/nunjucks/api.html#render)
+and [`Environment#renderString`](https://mozilla.github.io/nunjucks/api.html#renderstring) functions
+and enhance them to return the template's direct and transitive dependencies as well as its rendered content.
 
 ## Why?
 
-Bundlers such as [Parcel](https://parceljs.org/) provide the ability to track the direct and transitive dependencies of
-assets so that changes to those dependencies trigger updates in their dependents. nunjucks doesn't provide a built-in
-way to do this, so this functionality must currently be done in a non-optimal way e.g. by monitoring every file in
-a directory that has an `.njk` extension.
+Bundlers such as [Parcel](https://parceljs.org/) provide the ability to track asset dependencies
+so that changes to the dependencies trigger updates in their dependents. However, nunjucks doesn't
+provide a built-in way to do this.
 
-This package provides an easy way to retrieve a template's dependencies. In addition, it exposes some other metadata
-that is not exposed by the built-in `render` and `renderString` methods.
+This module provides a simple and efficient way to query this information without resorting to inefficient
+workarounds such as monitoring every file in a directory that has an `.njk` extension. It also provides
+promisified wrappers for the built-in `render` functions which fix nits and bypass
+[bugs](https://github.com/mozilla/nunjucks/issues/678) in the standard API.
 
 ## Why Not?
 
-This module doesn't provide direct access to a template's AST.
-Instead, it focuses on exposing the kind of metadata an AST might be queried for
-(although, in the particular case of dependencies, that data [cannot be extracted from the AST](https://github.com/devmattrick/parcel-plugin-nunjucks/issues/1#issuecomment-423495829)).
+This module doesn't provide direct access to a template's AST. Instead, it focuses on exposing the kind of
+metadata an AST might be queried for (although, in the case of dependencies, that data
+[cannot be extracted from the AST](https://github.com/devmattrick/parcel-plugin-nunjucks/issues/1#issuecomment-423495829)).
 In the event that you need the actual AST, use nunjucks' parser class.
 
 ```javascript
@@ -153,13 +142,20 @@ nodes.printNodes(ast)
 
 ## parseFile
 
-**Signature**: parseFile(env: [Environment](https://mozilla.github.io/nunjucks/api.html#environment), templatePath: string, options?: Object) → Promise&lt;Object&gt;
+**Signature**: parseFile(env: [Environment](https://mozilla.github.io/nunjucks/api.html#environment), templatePath: string, options?: Object) → Promise&lt;Result&gt;<br/>
+**Result**: { content: string, dependencies: { name: string, path: string, parent: string|null } }
 
 ```javascript
-const { content, template, dependencies } = await parseFile(env, templatePath, { data })
+const { content, dependencies } = await parseFile(env, templatePath, { data })
 ```
 
-An enhanced version of [renderFile](#renderfile) which augments its result with an array of objects representing the template's dependencies.
+An enhanced version of [`renderFile`](#renderfile) which returns the template's dependencies as well as its rendered content.
+
+Each dependency object contains the following fields:
+
+- name: the dependency's name as it appears in the source
+- parent: the resolved path of the dependency's parent file or URI, or null if it doesn't have one
+- path: the dependency's absolute path or URI
 
 The following options are supported:
 
@@ -167,29 +163,32 @@ The following options are supported:
 
 ## parseString
 
-**Signature**: parseString(env: [Environment](https://mozilla.github.io/nunjucks/api.html#environment), src: string, options?: Object) → Promise&lt;Object&gt;
+**Signature**: parseString(env: [Environment](https://mozilla.github.io/nunjucks/api.html#environment), src: string, options?: Object) → Promise&lt;Result&gt;<br />
+**Result**: { content: string, dependencies: { name: string, path: string, parent: string|null } }
 
 ```javascript
-const { content, template, dependencies } = await parseString(env, src, { data, path })
+const { content, dependencies } = await parseString(env, src, { data, path })
 ```
 
-An enhanced version of [renderString](#renderstring) which augments its result with an array of objects representing the template's dependencies.
+An enhanced version of [`renderString`](#renderstring) which returns the template's dependencies as well as its rendered content.
+
+Each dependency object contains the following fields:
+
+- name: the dependency's name as it appears in the source
+- parent: the resolved path of the dependency's parent file or URI, or null if it doesn't have one
+- path: the dependency's absolute path or URI
 
 The following options are supported:
 
 - data (Object): an optional value to expose as the template's "context"
-- path (string): an optional path/URL for the template: used to resolve file-relative paths and for error reporting
+- path (string): an optional absloute path/URI for the template: used to resolve relative paths and for error reporting
 
 ## renderFile
 
-**Signature**: renderFile(env: [Environment](https://mozilla.github.io/nunjucks/api.html#environment), src: string, options?: Object) → Promise&lt;Object&gt;
+**Signature**: renderFile(env: [Environment](https://mozilla.github.io/nunjucks/api.html#environment), src: templatePath, options?: Object) → Promise&lt;string&gt;
 
-```javascript
-const { content, template } = await renderFile(env, src, { data })
-```
-
-A promisified variant of [`Environment#render`](https://mozilla.github.io/nunjucks/api.html#render) which yields the resulting [Template](https://mozilla.github.io/nunjucks/api.html#template) object (`template`)
-as well as its rendered string (`content`).
+A version of [`Environment#render`](https://mozilla.github.io/nunjucks/api.html#render) which is (always)
+async and which is passed its context via an options object.
 
 The following options are supported:
 
@@ -197,19 +196,15 @@ The following options are supported:
 
 ## renderString
 
-**Signature**: renderString(env: [Environment](https://mozilla.github.io/nunjucks/api.html#environment), src: string, options?: Object) → Promise&lt;Object&gt;
+**Signature**: renderString(env: [Environment](https://mozilla.github.io/nunjucks/api.html#environment), src: string, options?: Object) → Promise&lt;string&gt;
 
-```javascript
-const { content, template } = await renderString(env, src, { data })
-```
-
-A promisified variant of [`Environment#renderString`](https://mozilla.github.io/nunjucks/api.html#renderstring) which yields the resulting [Template](https://mozilla.github.io/nunjucks/api.html#template) object (`template`)
-as well as its rendered string (`content`).
+A version of [`Environment#renderString`](https://mozilla.github.io/nunjucks/api.html#renderstring) which is (always)
+async and which is passed its context and path via an options object.
 
 The following options are supported:
 
 - data (Object): an optional value to expose as the template's "context"
-- path (string): an optional path/URL for the template: used to resolve file-relative paths and for error reporting
+- path (string): an optional absloute path/URI for the template: used to resolve relative paths and for error reporting
 
 # DEVELOPMENT
 

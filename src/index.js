@@ -1,5 +1,5 @@
-import { Template } from 'nunjucks'
-import promisify    from 'pify'
+const { Template } = require('nunjucks')
+const promisify    = require('pify')
 
 // returns a wrapped version of Environment#getTemplate which appends the
 // dependencies discovered during the course of its run (which may make nested
@@ -72,34 +72,31 @@ function wrapGetTemplate (env, dependencies) {
     }
 }
 
-// an alternative to Environment#render which is (always) async and which
-// yields a { content: string, template: Template } pair rather than just the
-// content
-export async function renderFile (env, templatePath, _options) {
+// a version of Environment#render which is (always) async and which
+// is passed the data via an options object
+async function renderFile (env, templatePath, _options) {
     const options = _options || {}
     const getTemplate = promisify(env.getTemplate.bind(env))
     const template = await getTemplate(templatePath)
     const render = promisify(template.render.bind(template))
-    const content = await render(options.data)
 
-    return { content, template }
+    return render(options.data)
 }
 
-// an alternative to Environment#renderString which is (always) async and which
-// yields a { content: string, template: Template } pair rather than just the
-// content
-export async function renderString (env, src, _options) {
+// a version of Environment#renderString which is (always) async and which
+// is passed the data and path via an options object
+function renderString (env, src, _options) {
     const options = _options || {}
     const template = new Template(src, env, options.path)
     const render = promisify(template.render.bind(template))
-    const content = await render(options.data)
 
-    return { content, template }
+    return render(options.data)
 }
 
-// `parseFile` and `parseString` are versions of `renderFile` and `renderString`,
-// respectively, which augment their results with an array of the transitive
-// dependencies (templates) discovered during the course of their execution
+// `parseFile` and `parseString` are versions of `Environment#render` and
+// `Environment#renderString`, respectively, which augment their results with an
+// array of the transitive dependencies (templates) discovered during the course
+// of their execution
 //
 // the underlying method in the `render` functions is Environment#getTemplate,
 // which is called explicitly by `renderFile`, but also from generated/compiled
@@ -184,31 +181,57 @@ export async function renderString (env, src, _options) {
 // a private helper implementing code common to `parseFile` and `parseString`
 async function parse (env, render, pathOrSource, options) {
     const dependencies = []
+    const getTemplate = wrapGetTemplate(env, dependencies)
 
-    // empty handler: delegate everything to env apart from `getTemplate`
+    // we need to disable caching (by thread-locally clearing the cache) in order
+    // to traverse all of the descendant files.
     //
-    // XXX some Environment methods chain (e.g. `addFilter`, `addExtension` etc.).
-    // we're not intercepting those (to return the shim) because they're
-    // not called via any code path beneath `getTemplate` (in fact they're not
-    // called anywhere in the nunjucks codebase), but in theory they could be
-    // called e.g. via a callback
-    const shim = new Proxy(env, {})
+    // despite environments having a noCache option, it's effectively ignored
+    // in nunjucks and all accesses are performed by reading from and writing to
+    // env.loader[*].cache, so we simulate a pristine (but still functional) cache
+    // by targeting a new thread-local store (a plain object) when the cache
+    // is read from or written to.
+    const cache = {}
+    const fakeLoaders = env.loaders.map(loader => {
+        return new Proxy(loader, {
+            get (target, name, receiver) {
+                return (name === 'cache')
+                    ? cache
+                    : Reflect.get(target, name, receiver)
+            }
+        })
+    })
 
-    shim.getTemplate = wrapGetTemplate(env, dependencies)
+    // override `getTemplate` and inject the wrappers we use to (thread-locally)
+    // clear the loaders' caches
+    const shim = new Proxy(env, {
+        get (target, name, receiver) {
+            if (name === 'getTemplate') {
+                return getTemplate
+            } else if (name === 'loaders') {
+                return fakeLoaders
+            } else {
+                const result = Reflect.get(target, name, receiver)
+                return (result === target) ? receiver : result
+            }
+        }
+    })
 
-    const result = await render(shim, pathOrSource, options || {})
+    const content = await render(shim, pathOrSource, options || {})
 
-    return { ...result, dependencies }
+    return { content, dependencies }
 }
 
 // an enhanced version of `renderFile` which augments its result with an array
 // of the template's dependencies
-export function parseFile (env, templatePath, options) {
+function parseFile (env, templatePath, options) {
     return parse(env, renderFile, templatePath, options)
 }
 
 // an enhanced version of `renderString` which augments its result with an array
 // of the template's dependencies
-export function parseString (env, src, options) {
+function parseString (env, src, options) {
     return parse(env, renderString, src, options)
 }
+
+module.exports = { parseFile, parseString, renderString, renderFile }
