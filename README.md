@@ -42,7 +42,7 @@ nunjucks-parser - extract dependencies from nunjucks templates
 
 ```jinja
 {% include "components/header.html" %}
-<h1>Body</h1>
+<h1>Hello, world!</h1>
 {% include "components/footer.html" %}
 ```
 
@@ -65,19 +65,26 @@ nunjucks-parser - extract dependencies from nunjucks templates
 Copyright ⓒ example.com 2018
 ```
 
-### test.js
+### example.js
 
 ```javascript
 import nunjucks      from 'nunjucks'
 import { parseFile } from 'nunjucks-parser'
 
-const env = nunjucks.configure('example')
+const env = nunjucks.configure('./example')
 const { content, dependencies } = await parseFile(env, 'layout.html')
-
-console.log(dependencies)
 ```
 
-### result
+### content
+
+```html
+<h1>Header</h1>
+<h1>Hello, world!</h1>
+<h1>Footer</h1>
+Copyright ⓒ example.com 2018
+```
+
+### dependencies
 
 ```javascript
 [
@@ -114,7 +121,7 @@ and enhance them to return the template's direct and transitive dependencies as 
 ## Why?
 
 Bundlers such as [Parcel](https://parceljs.org/) provide the ability to track asset dependencies
-so that changes to the dependencies trigger updates in their dependents. However, nunjucks doesn't
+so that changes to those dependencies trigger updates in their dependents. However, nunjucks doesn't
 provide a built-in way to do this.
 
 This module provides a simple and efficient way to query this information without resorting to inefficient
@@ -181,7 +188,7 @@ Each dependency object contains the following fields:
 The following options are supported:
 
 - data (Object): an optional value to expose as the template's "context"
-- path (string): an optional absloute path/URI for the template: used to resolve relative paths and for error reporting
+- path (string): an optional absolute path/URI for the template: used to resolve relative paths and for error reporting
 
 ## renderFile
 
@@ -204,7 +211,7 @@ async and which is passed its context and path via an options object.
 The following options are supported:
 
 - data (Object): an optional value to expose as the template's "context"
-- path (string): an optional absloute path/URI for the template: used to resolve relative paths and for error reporting
+- path (string): an optional absolute path/URI for the template: used to resolve relative paths and for error reporting
 
 # DEVELOPMENT
 
@@ -236,7 +243,7 @@ This package is tested and supported on environments which meet the following re
 
 # VERSION
 
-0.0.1
+0.0.2
 
 # AUTHOR
 

@@ -8,7 +8,7 @@ const promisify    = require('pify')
 // before:
 //
 //    getTemplate (name, parent, data) {
-//        const template = this._resolveTemplate(name)
+//        const template = this._resolveTemplate(name, parent)
 //        return template.render(data)
 //    }
 //
@@ -17,7 +17,7 @@ const promisify    = require('pify')
 //    const dependencies = []
 //
 //    getTemplate (name, parent, data) {
-//        const template = this._resolveTemplate(name)
+//        const template = this._resolveTemplate(name, parent)
 //        const result = template.render(data)
 //        dependencies.push({ name, parent, path: result.path })
 //        return result
@@ -26,9 +26,19 @@ const promisify    = require('pify')
 function wrapGetTemplate (env, dependencies) {
     const oldGetTemplate = env.getTemplate
 
+    // XXX everything here apart from the dependency push is copypasta from
+    // nunjucks.Environment (v3.x) and can go away if/when this data is exposed
+    // by nunjucks e.g. via an event emitter:
+    //
+    // https://github.com/mozilla/nunjucks/issues/1153
+
     return function getTemplate (...args) {
         let [name, eagerCompile, parent, ignoreMissing, cb] = args
         let replace = 4
+
+        if (name && name.raw) {
+            name = name.raw
+        }
 
         if (typeof parent === 'function') {
             cb = parent
@@ -234,4 +244,4 @@ function parseString (env, src, options) {
     return parse(env, renderString, src, options)
 }
 
-module.exports = { parseFile, parseString, renderString, renderFile }
+module.exports = { parseFile, parseString, renderFile, renderString }

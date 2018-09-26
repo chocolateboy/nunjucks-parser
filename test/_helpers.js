@@ -18,7 +18,7 @@ function normalize (html) {
     return html.replace(/\n{2,}/g, "\n")
 }
 
-const templateDir = cwd('example')
+const templateDir = cwd('./example')
 const env = Nunjucks.configure(templateDir)
 const content = Fs.readFileSync(cwd('fixtures/content.html'), 'utf8')
 const fileDependencies = cwd.require('fixtures/dependencies/file.js')(templateDir)
