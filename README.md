@@ -41,11 +41,9 @@ nunjucks-parser - extract dependencies from nunjucks templates
 
 # SYNOPSIS
 
-### templates
+### layout.html
 
 <details>
-
-### layout.html
 
 ```jinja
 {% include "components/header.html" %}
