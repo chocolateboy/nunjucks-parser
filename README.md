@@ -41,6 +41,10 @@ nunjucks-parser - extract dependencies from nunjucks templates
 
 # SYNOPSIS
 
+### templates
+
+<details>
+
 ### layout.html
 
 ```jinja
@@ -67,6 +71,8 @@ nunjucks-parser - extract dependencies from nunjucks templates
 ```
 Copyright ⓒ example.com 2018
 ```
+
+</details>
 
 ### example.js
 
