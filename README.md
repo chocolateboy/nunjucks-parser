@@ -146,7 +146,7 @@ In the event that you need the actual AST, use nunjucks' parser class.
 ```javascript
 import { parser, nodes } from 'nunjucks'
 
-const src = 'Hello, {{ name }}'
+const src = 'Hello, {{ name }}!'
 const ast = parser.parse(src)
 
 nodes.printNodes(ast)
@@ -162,15 +162,15 @@ The following types are referenced in the [exports](#exports) below.
 type Dependency {
     name: string,
     path: string,
-    parent: string|null
+    parent: string | null
 }
 ```
 
 Each dependency object contains the following fields:
 
 - name: the dependency's name as it appears in the source
-- parent: the resolved path of the dependency's parent file or URI, or null if it doesn't have one
 - path: the dependency's absolute path or URI
+- parent: the resolved path of the dependency's parent file or URI, or null if it doesn't have one
 
 ## Result
 
@@ -197,31 +197,8 @@ The following options are supported:
 
 - data (Object): an optional value to expose as the template's "context"
 
-Dependencies are returned in the order in which they're traversed — depth first — and all descendants
-are returned, including those that are loaded dynamically. For example, if page-3 in the following
-graph loads page-4 the first time it's loaded and page-5 the second time:
-
-                  index
-                 /      \
-                /        \
-               /          \
-              /            \
-           page-1        page-2
-             \              /
-              \            /
-               \          /
-                \        /
-                  page-3
-                 /      \
-                /        \
-               /          \
-              /            \
-             /              \
-            page-4      page-5
-
-\- its dependencies will be ordered as follows:
-
-    index -> page-1 -> page-3 -> page-4 -> page-2 -> page-3 -> page-5
+Dependencies are returned in the order in which they're traversed (depth first), and all descendants
+are returned, including those that are loaded dynamically.
 
 If deduplicated dependencies are needed, they can be distinguished by the `path` property e.g.:
 
