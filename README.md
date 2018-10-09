@@ -159,10 +159,10 @@ The following types are referenced in the [exports](#exports) below.
 ## Dependency
 
 ```typescript
-type Dependency {
-    name: string,
-    path: string,
-    parent: string | null
+type Dependency = {
+    name: string;
+    path: string;
+    parent: string | null;
 }
 ```
 
@@ -175,9 +175,9 @@ Each dependency object contains the following fields:
 ## Result
 
 ```typescript
-type Result {
-    content: string,
-    dependencies: Array<Dependency>
+type Result = {
+    content: string;
+    dependencies: Array<Dependency>;
 }
 ```
 
@@ -272,7 +272,7 @@ This package is tested and supported on environments which meet the following re
 
 # VERSION
 
-0.0.3
+1.0.0
 
 # AUTHOR
 

@@ -1,3 +1,7 @@
+## 1.0.0 - 2018-10-09
+
+- documentation tweaks
+
 ## 0.0.3 - 2018-09-27
 
 - bug: don't share the same cache between different loaders
