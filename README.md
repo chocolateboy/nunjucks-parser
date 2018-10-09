@@ -268,7 +268,7 @@ This package is tested and supported on environments which meet the following re
 # SEE ALSO
 
 * [nunjucks](https://www.npmjs.com/package/nunjucks)
-* [parcel-plugin-nunjucks](https://www.npmjs.com/package/parcel-plugin-nunjucks)
+* [parcel-plugin-nunjucks](https://www.npmjs.com/package/@chocolateboy/parcel-plugin-nunjucks)
 
 # VERSION
 
