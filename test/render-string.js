@@ -1,28 +1,40 @@
-import { renderString }                      from '..'
-import { cwd, env, layout, normalize, want } from './_helpers.js'
-import test                                  from 'ava'
-import { sprintf }                           from 'sprintf-js'
+import { renderString } from '..'
+import { self, test }   from './_helpers.js'
+import Nunjucks         from 'nunjucks'
+import { sprintf }      from 'sprintf-js'
 
-const templatePath = cwd('example/layout.html')
+const templateDir = self.resolve('./example')
+const templatePath = `${templateDir}/layout.html`
+const template = self.read(templatePath)
+const wantContent = self.read('./fixtures/content/example.html')
+const env = Nunjucks.configure(templateDir)
 
 test('renderString (without data, without path)', async t => {
-    const content = await renderString(env.example, layout)
-    t.is(normalize(content), sprintf(want.content.example, 'world'))
+    const wantHTML = sprintf(wantContent, 'world')
+    const content = await renderString(env, template)
+
+    t.isHTML(content, wantHTML)
 })
 
 test('renderString (without data, with path)', async t => {
-    const content = await renderString(env.example, layout, { path: templatePath })
-    t.is(normalize(content), sprintf(want.content.example, 'world'))
+    const wantHTML = sprintf(wantContent, 'world')
+    const content = await renderString(env, template, { path: templatePath })
+
+    t.isHTML(content, wantHTML)
 })
 
 test('renderString (with data, without path)', async t => {
     const data = { name: 'nunjucks' }
-    const content = await renderString(env.example, layout, { data })
-    t.is(normalize(content), sprintf(want.content.example, 'nunjucks'))
+    const wantHTML = sprintf(wantContent, 'nunjucks')
+    const content = await renderString(env, template, { data })
+
+    t.isHTML(content, wantHTML)
 })
 
 test('renderString (with data, with path)', async t => {
     const data = { name: 'nunjucks' }
-    const content = await renderString(env.example, layout, { data, path: templatePath })
-    t.is(normalize(content), sprintf(want.content.example, 'nunjucks'))
+    const wantHTML = sprintf(wantContent, 'nunjucks')
+    const content = await renderString(env, template, { data, path: templatePath })
+
+    t.isHTML(content, wantHTML)
 })

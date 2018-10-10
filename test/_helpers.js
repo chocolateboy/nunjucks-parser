@@ -1,16 +1,29 @@
-import Fs       from 'fs'
-import Nunjucks from 'nunjucks'
-import Path     from 'path'
+import avaTest from 'ava'
+import Fs      from 'fs'
+import Path    from 'path'
 
-// return the absolute path of the supplied file/directory name relative to the
-// current directory (__dirname)
-function cwd (path) {
-    return Path.join(__dirname, path)
+const testExtensions = {
+    isHTML (got, want) {
+        this.is(normalize(got), want)
+    }
 }
 
-// shortcut for require(cwd(path))
-cwd.require = function (path) {
-    return require(this(path))
+const self = {
+    read (path) {
+        const resolved = this.resolve(path)
+        return Fs.readFileSync(resolved, 'utf8')
+    },
+
+    resolve (path) {
+        return Path.resolve(__dirname, path)
+    }
+}
+
+function wrap (callback) {
+    return function (t) {
+        Object.assign(t, testExtensions)
+        return callback.call(this, t)
+    }
 }
 
 // remove stray newlines from the rendered HTML to simplify diffing
@@ -18,44 +31,16 @@ function normalize (html) {
     return html.replace(/\n{2,}/g, "\n")
 }
 
-const cacheDir = cwd('./cache')
-const exampleDir = cwd('./example')
+// a version of ava's `test` export which adds domain-specific methods to its
+// `t` instance e.g. t.isHTML(...) i.e. a DWIM version of ava's "macros"
+// XXX there may be a way to add these to the `t` object's prototype rather than
+// assigning them to `t` on every call
 
-const cacheContentLhs = Fs.readFileSync(cwd('fixtures/content/cache-lhs.html'), 'utf8')
-const cacheContentRhs = Fs.readFileSync(cwd('fixtures/content/cache-rhs.html'), 'utf8')
-const cacheDependenciesLhs = cwd.require('fixtures/dependencies/cache-lhs.js')(cacheDir)
-const cacheDependenciesRhs = cwd.require('fixtures/dependencies/cache-rhs.js')(cacheDir)
-const cacheEnv = Nunjucks.configure(cacheDir)
-const exampleContent = Fs.readFileSync(cwd('fixtures/content/example.html'), 'utf8')
-const exampleEnv = Nunjucks.configure(exampleDir)
-const fileDependencies = cwd.require('fixtures/dependencies/file.js')(exampleDir)
-const layout = Fs.readFileSync(cwd('example/layout.html'), 'utf8')
-const stringWithoutPathDependencies = cwd.require('fixtures/dependencies/string-without-path.js')(exampleDir)
-const stringWithPathDependencies = cwd.require('fixtures/dependencies/string-with-path.js')(exampleDir)
-
-const dependencies = {
-    cache: {
-        lhs: cacheDependenciesLhs,
-        rhs: cacheDependenciesRhs,
-    },
-    file: fileDependencies,
-    string: {
-        path: stringWithPathDependencies,
-        noPath: stringWithoutPathDependencies,
+const test = new Proxy(avaTest, {
+    apply (target, $this, args) {
+        args[args.length - 1] = wrap(args[args.length - 1])
+        return Reflect.apply(avaTest, $this, args)
     }
-}
+})
 
-const env = { example: exampleEnv, cache: cacheEnv }
-
-const want = {
-    content: {
-        example: exampleContent,
-        cache: {
-            lhs: cacheContentLhs,
-            rhs: cacheContentRhs,
-        }
-    },
-    dependencies,
-}
-
-export { cwd, env, layout, normalize, want }
+export { self, test }
