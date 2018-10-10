@@ -1,4 +1,4 @@
-## 1.0.1 - TBD
+## 1.0.1 - 2018-10-10
 
 - remove unused dependency
 - test cleanup
