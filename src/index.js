@@ -1,4 +1,3 @@
-const uniqBy       = require('lodash.uniqby')
 const { Template } = require('nunjucks')
 const promisify    = require('pify')
 
