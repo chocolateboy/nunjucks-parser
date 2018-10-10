@@ -1,3 +1,8 @@
+## 1.0.1 - TBD
+
+- remove unused dependency
+- test cleanup
+
 ## 1.0.0 - 2018-10-09
 
 - documentation tweaks
