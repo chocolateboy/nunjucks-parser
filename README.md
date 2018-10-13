@@ -203,9 +203,9 @@ are returned, including those that are loaded dynamically.
 If deduplicated dependencies are needed, they can be distinguished by the `path` property e.g.:
 
 ```javascript
-import _ from 'lodash'
+import { uniqBy } from 'lodash'
 
-const deduped = _.uniqBy(dependencies, 'path')
+const deduped = uniqBy(dependencies, 'path')
 ```
 
 ## parseString
