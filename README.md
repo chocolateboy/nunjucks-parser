@@ -203,6 +203,8 @@ are returned, including those that are loaded dynamically.
 If deduplicated dependencies are needed, they can be distinguished by the `path` property e.g.:
 
 ```javascript
+import _ from 'lodash'
+
 const deduped = _.uniqBy(dependencies, 'path')
 ```
 
