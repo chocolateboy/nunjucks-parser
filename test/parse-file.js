@@ -9,8 +9,8 @@ const wantDependencies = require('./fixtures/dependencies/file.js')(templateDir)
 const env = Nunjucks.configure(templateDir)
 
 test('parseFile (without data)', async t => {
-    const result = await parseFile(env, 'layout.html')
     const wantHTML = sprintf(wantContent, 'world')
+    const result = await parseFile(env, 'layout.html')
 
     t.isHTML(result.content, wantHTML)
     t.deepEqual(result.dependencies, wantDependencies)
@@ -18,8 +18,8 @@ test('parseFile (without data)', async t => {
 
 test('parseFile (with data)', async t => {
     const data = { name: 'nunjucks' }
-    const result = await parseFile(env, 'layout.html', { data })
     const wantHTML = sprintf(wantContent, 'nunjucks')
+    const result = await parseFile(env, 'layout.html', { data })
 
     t.isHTML(result.content, wantHTML)
     t.deepEqual(result.dependencies, wantDependencies)

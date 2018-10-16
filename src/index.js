@@ -119,15 +119,15 @@ function renderString (env, src, _options) {
 // execution: other invocations of the method may happen during that window.
 //
 // for the same reason, the state can't be a property of the Environment
-// instance, i.e. of `this`, since that state is shared across multiple
+// instance, i.e. of `this`, as that may be shared across multiple
 // invocations.
 //
 // one way to scope state to a method call is to pass the state
 // into and down from the call as a parameter e.g.:
 //
 //    getTemplate (state, name, parent, data) {
-//        const template = this._resolveTemplate(name)
-//        const result = template.render(state, data)
+//        const template = this._resolveTemplate(state, name)
+//        const result = template.render(data)
 //        state.dependencies.push({ name, parent, path: template.path })
 //        return result
 //    }
@@ -136,10 +136,10 @@ function renderString (env, src, _options) {
 //    const result = env.getTemplate(state, name, parent, data)
 //    console.log(state.dependencies)
 //
-// this works, but, is hugely disruptive, requiring changes not only to the
+// this works but it's hugely disruptive, requiring changes not only to the
 // signature and internals of `getTemplate` but to any method it calls that
 // might lead to a nested `getTemplate` call. this solution is particularly
-// impractical for nunjucks since these calls may be baked into compiled code.
+// impractical for nunjucks since these calls may be baked into compiled code,
 // which can't be "upgraded" to support a new protocol for "thread local"
 // (i.e. per method-call) state.
 //
@@ -176,7 +176,14 @@ function renderString (env, src, _options) {
 //    const shim = new Proxy(env, {})
 //    shim.getTemplate = wrapGetTemplate(env, dependencies)
 //    const result = shim.getTemplate(name, parent, data)
-//    return { result, dependencies }
+//    console.log(dependencies)
+//
+// note that using a shim in this way is equivalent to the original solution of
+// passing down an extra state parameter: it's just passed down implicitly/automatically
+// as the hidden `this` parameter, rather than as an explicit parameter, which
+// sidesteps the API compatibility issues. to leverage this mechanism, we simply
+// need to turn the original idea of annotating `this` with extra state inside out:
+// rather than attaching state to the instance, we attach the instance to the state.
 //
 // this technique also scales well if the implementation changes e.g. it's easy
 // to collect dependencies emitted via an event emitter [2] by replacing the
@@ -192,12 +199,12 @@ async function parse (env, render, pathOrSource, _options) {
     const getTemplate = wrapGetTemplate(env, dependencies)
 
     // we need to disable caching (thread-locally) in order to traverse all of
-    // the descendant files.
+    // the descendant files
     const fakeLoaders = env.loaders.map(loader => {
         // despite environments having a noCache option, it's effectively ignored
         // in nunjucks, and all cache operations are performed by reading from
-        // and writing to env.loader[*].cache. by intercepting this value, we can
-        // return false for all cache probes, ensuring dynamic dependencies
+        // and writing to env.loaders[*].cache. by intercepting this property,
+        // we can return false for all cache probes, ensuring dynamic dependencies
         // are always reached
         return new Proxy(loader, {
             get (target, name, receiver) {
@@ -207,7 +214,7 @@ async function parse (env, render, pathOrSource, _options) {
     })
 
     // override `getTemplate` and inject the wrappers we use to (thread-locally)
-    // clear the loaders' caches
+    // void the loaders' caches
     const shim = new Proxy(env, {
         get (target, name, receiver) {
             if (name === 'getTemplate') {
