@@ -171,18 +171,16 @@ function renderString (env, src, _options) {
 // (potentially much heavier) `clone` implementation:
 //
 //    const dependencies = []
-//    const shim = new Proxy(env, {})
-//    shim.getTemplate = wrapGetTemplate(env, dependencies)
+//    const getTemplate = wrapGetTemplate(env, dependencies)
+//    const get = (target, name) => name === 'getTemplate' ? getTemplate : ...
+//    const shim = new Proxy(env, { get })
 //    const result = shim.getTemplate(name, parent, data)
 //    console.log(dependencies)
 //
 // note that using a shim in this way is equivalent to the original solution of
 // passing down an extra state parameter: it's just passed down
 // implicitly/automatically as the hidden `this` parameter, rather than as an
-// explicit parameter, which sidesteps the API compatibility issues. to leverage
-// this mechanism, we simply need to turn the original idea of annotating `this`
-// with extra state inside out: rather than attaching state to the instance, we
-// attach the instance to the state.
+// explicit parameter, which sidesteps the API compatibility issues.
 //
 // this technique also scales well if the implementation changes e.g. it's easy
 // to collect dependencies emitted via an event emitter [3] by replacing the

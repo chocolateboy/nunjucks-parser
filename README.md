@@ -224,7 +224,7 @@ In addition to the options supported by [`parseFile`](#parsefile), `parseString`
 
 ## renderFile
 
-**Signature**: renderFile(env: [Environment](https://mozilla.github.io/nunjucks/api.html#environment), src: templatePath, options?: Object) → Promise&lt;string&gt;
+**Signature**: renderFile(env: [Environment](https://mozilla.github.io/nunjucks/api.html#environment), templatePath: string, options?: Object) → Promise&lt;string&gt;
 
 A version of [`Environment#render`](https://mozilla.github.io/nunjucks/api.html#render) which is (always)
 async and which is passed its context via an options object.
