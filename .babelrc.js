@@ -13,12 +13,10 @@ module.exports = {
             useBuiltIns: 'usage',
 
             // set this to true to see the applied transforms and bundled polyfills
-            debug: false,
+            debug: process.env.NODE_ENV === 'development',
 
-            // https://jamie.build/last-2-versions
-            targets: {
-                browsers: ['>0.25%', 'not ie 11', 'not op_mini all'],
-            },
+            // the targets are defined in pkg.browserslist, and are a tweaked
+            // version of: https://jamie.build/last-2-versions
         }]
     ],
 

@@ -264,7 +264,7 @@ The following NPM scripts are available:
 This package is tested and supported on environments which meet the following requirements:
 
 - ES6 Proxy support e.g.
-  - Node >= v6.0
+  - Node >= v8.0
   - browsers > IE11
 
 # SEE ALSO

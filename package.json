@@ -17,8 +17,19 @@
         "dist/index.js"
     ],
     "ava": {
-        "files": ["test/*.js"]
+        "files": [
+            "test/*.js"
+        ]
     },
+    "browserslist": [
+        ">0.25%",
+        "firefox 56",
+        "firefox esr",
+        "maintained node versions",
+        "not dead",
+        "not ie 11",
+        "not op_mini all"
+    ],
     "dependencies": {
         "@babel/runtime": "^7.0.0",
         "core-js": "^3.1.4",
