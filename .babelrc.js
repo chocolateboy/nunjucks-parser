@@ -1,5 +1,4 @@
-// vim:syntax=javascript
-{
+module.exports = {
     env: {
         development: {
             sourceMaps: 'inline',
@@ -8,6 +7,8 @@
 
     presets: [
         ['@babel/preset-env', {
+            corejs: 3,
+
             // only include polyfills if they're used
             useBuiltIns: 'usage',
 
@@ -15,7 +16,9 @@
             debug: false,
 
             // https://jamie.build/last-2-versions
-            targets: { browsers: [ '>0.25%', 'not ie 11', 'not op_mini all' ] },
+            targets: {
+                browsers: ['>0.25%', 'not ie 11', 'not op_mini all'],
+            },
         }]
     ],
 

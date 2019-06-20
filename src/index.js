@@ -2,8 +2,8 @@ const { Template } = require('nunjucks')
 const promisify    = require('pify')
 
 // returns a wrapped version of Environment#getTemplate which appends the
-// dependencies discovered during the course of its run (which may make nested
-// calls to `getTemplate`) to the supplied array.
+// dependencies discovered during the course of its thread of execution (which
+// may make nested calls to `getTemplate`) to the supplied array.
 //
 // before:
 //
@@ -21,7 +21,7 @@ const promisify    = require('pify')
 //        const result = template.render(data)
 //        dependencies.push({ name, parent, path: result.path })
 //        return result
-//    }
+//   }
 
 function wrapGetTemplate (env, dependencies) {
     const oldGetTemplate = env.getTemplate
@@ -108,22 +108,21 @@ function renderString (env, src, _options) {
 // array of the transitive dependencies (templates) discovered during the course
 // of their execution
 //
-// the underlying method in the `render` functions is Environment#getTemplate,
+// the underlying method in the `render` functions is `Environment#getTemplate`,
 // which is called explicitly by `renderFile`, but also from generated/compiled
 // code in nested templates.
 //
-// calls to `getTemplate` can be executed concurrently (i.e. interleaved)
-// e.g. while one call is waiting for a network resource, another
-// can run and return immediately with a precompiled result. this means
-// we can't use the start and end of the method call to delimit its
-// execution: other invocations of the method may happen during that window.
+// calls to `getTemplate` can be executed concurrently (i.e. interleaved) e.g.
+// while one call is waiting for a network resource, another can run and return
+// immediately with a precompiled result. this means we can't use the start and
+// end of the method call to delimit its execution: other invocations of the
+// method may happen during that window.
 //
 // for the same reason, the state can't be a property of the Environment
-// instance, i.e. of `this`, as that may be shared across multiple
-// invocations.
+// instance, i.e. of `this`, as that may be shared across multiple invocations.
 //
-// one way to scope state to a method call is to pass the state
-// into and down from the call as a parameter e.g.:
+// one way to scope state to a method call is to pass the state into and down
+// from the call as a parameter e.g.:
 //
 //    getTemplate (state, name, parent, data) {
 //        const template = this._resolveTemplate(state, name)
@@ -140,14 +139,13 @@ function renderString (env, src, _options) {
 // signature and internals of `getTemplate` but to any method it calls that
 // might lead to a nested `getTemplate` call. this solution is particularly
 // impractical for nunjucks since these calls may be baked into compiled code,
-// which can't be "upgraded" to support a new protocol for "thread local"
+// which can't be "upgraded" to support a new protocol for "thread local" [1]
 // (i.e. per method-call) state.
 //
-// a better solution is to avoid concurrency/mutation altogether. we can do
-// this by creating a private clone of the Environment and calling `getTemplate`
-// on that. because it's private, nothing in the outside world can access or
-// mutate it. because it's a clone, it won't modify anything in the outside
-// world.
+// a better solution is to avoid concurrency/mutation altogether. we can do this
+// by creating a private clone of the Environment and calling `getTemplate` on
+// that. because it's private, nothing in the outside world can access or mutate
+// it. because it's a clone, it won't modify anything in the outside world.
 //
 //    const dependencies = []
 //    const clone = env.clone()
@@ -155,22 +153,22 @@ function renderString (env, src, _options) {
 //    const result = clone.getTemplate(name, parent, data)
 //    console.log(dependencies)
 //
-// the "viral" nature of the hidden `this` parameter means the clone will
-// get passed down to nested `getTemplate` calls, which is just what we
-// want: things outside the bubble of encapsulation stay outside and things
-// inside the bubble stay inside.
+// the "viral" nature of the hidden `this` parameter means the clone will get
+// passed down to nested `getTemplate` calls, which is just what we want: things
+// outside the bubble of encapsulation stay outside and things inside the bubble
+// stay inside.
 //
 // the only drawback with this approach is that we lose things from the original
-// env that we don't need to jettison. in order to harvest dependencies,
-// the only things we need to override are `getTemplate` and caching.
-// everything else can be delegated to the original env.
+// env that we don't need to jettison. in order to harvest dependencies, the
+// only things we need to override are `getTemplate` and caching. everything
+// else can be delegated to the original env.
 //
-// this suggests that we don't need an Environment#clone method after all
-// (which is just as well since nunjucks doesn't provide one — yet [1]). Our
-// temporary env is not so much a clone as a *shim*, an object that delegates
-// almost everything to its target. as of ES6, we have a built-in way to create
-// shims like this quickly and easily without waiting for a library to bless us
-// with a (potentially much heavier) `clone` implementation:
+// this suggests that we don't need an Environment#clone method after all (which
+// is just as well since nunjucks doesn't provide one — yet [2]). Our temporary
+// env is not so much a clone as a *shim*, an object that delegates almost
+// everything to its target. as of ES6, we have a built-in way to create shims
+// like this quickly and easily without waiting for a library to bless us with a
+// (potentially much heavier) `clone` implementation:
 //
 //    const dependencies = []
 //    const shim = new Proxy(env, {})
@@ -179,18 +177,20 @@ function renderString (env, src, _options) {
 //    console.log(dependencies)
 //
 // note that using a shim in this way is equivalent to the original solution of
-// passing down an extra state parameter: it's just passed down implicitly/automatically
-// as the hidden `this` parameter, rather than as an explicit parameter, which
-// sidesteps the API compatibility issues. to leverage this mechanism, we simply
-// need to turn the original idea of annotating `this` with extra state inside out:
-// rather than attaching state to the instance, we attach the instance to the state.
+// passing down an extra state parameter: it's just passed down
+// implicitly/automatically as the hidden `this` parameter, rather than as an
+// explicit parameter, which sidesteps the API compatibility issues. to leverage
+// this mechanism, we simply need to turn the original idea of annotating `this`
+// with extra state inside out: rather than attaching state to the instance, we
+// attach the instance to the state.
 //
 // this technique also scales well if the implementation changes e.g. it's easy
-// to collect dependencies emitted via an event emitter [2] by replacing the
+// to collect dependencies emitted via an event emitter [3] by replacing the
 // shim's `getTemplate` override with an `emit` override
 //
-// [1] https://github.com/mozilla/nunjucks/pull/897
-// [2] https://github.com/mozilla/nunjucks/issues/1153
+// [1] AKA "continuation local": https://github.com/othiym23/node-continuation-local-storage
+// [2] https://github.com/mozilla/nunjucks/pull/897
+// [3] https://github.com/mozilla/nunjucks/issues/1153
 
 // a private helper implementing code common to `parseFile` and `parseString`
 async function parse (env, render, pathOrSource, _options) {
@@ -201,11 +201,11 @@ async function parse (env, render, pathOrSource, _options) {
     // we need to disable caching (thread-locally) in order to traverse all of
     // the descendant files
     const fakeLoaders = env.loaders.map(loader => {
-        // despite environments having a noCache option, it's effectively ignored
-        // in nunjucks, and all cache operations are performed by reading from
-        // and writing to env.loaders[*].cache. by intercepting this property,
-        // we can return false for all cache probes, ensuring dynamic dependencies
-        // are always reached
+        // despite environments having a noCache option, it's effectively
+        // ignored in nunjucks, and all cache operations are performed by
+        // reading from and writing to env.loaders[*].cache. by intercepting
+        // this property, we can return false for all cache probes, ensuring
+        // dynamic dependencies are always reached
         return new Proxy(loader, {
             get (target, name, receiver) {
                 return (name === 'cache') ? {} : Reflect.get(target, name, receiver)
@@ -228,7 +228,7 @@ async function parse (env, render, pathOrSource, _options) {
         }
     })
 
-    const content = await render(shim, pathOrSource, options || {})
+    const content = await render(shim, pathOrSource, options)
 
     return { content, dependencies }
 }
