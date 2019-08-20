@@ -140,7 +140,7 @@ promisified versions of the built-in `render` functions which fix nits and bypas
 
 This module doesn't provide direct access to a template's AST. Instead, it focuses on exposing the kind of
 metadata an AST might be queried for (although, in the case of dependencies, that data
-[cannot be extracted from the AST](https://github.com/devmattrick/parcel-plugin-nunjucks/issues/1#issuecomment-423495829)).
+[cannot be extracted from the AST](https://github.com/chocolateboy/parcel-plugin-nunjucks/issues/1#issuecomment-423495829)).
 In the event that you need the actual AST, use nunjucks' parser class.
 
 ```javascript
