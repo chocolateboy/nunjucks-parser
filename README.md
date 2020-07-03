@@ -287,7 +287,7 @@ requirements:
 
 # VERSION
 
-1.0.2
+1.1.0
 
 # AUTHOR
 
@@ -295,7 +295,7 @@ requirements:
 
 # COPYRIGHT AND LICENSE
 
-Copyright © 2018-2019 by chocolateboy.
+Copyright © 2018-2020 by chocolateboy.
 
 This is free software; you can redistribute it and/or modify it under the
 terms of the [Artistic License 2.0](https://www.opensource.org/licenses/artistic-license-2.0.php).
