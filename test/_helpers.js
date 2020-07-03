@@ -1,7 +1,7 @@
-import test           from 'ava'
-import { Assertions } from 'ava/lib/assert.js'
-import Fs             from 'fs'
-import Path           from 'path'
+const test           = require('ava')
+const { Assertions } = require('ava/lib/assert.js')
+const Fs             = require('fs')
+const Path           = require('path')
 
 // remove stray newlines from the rendered HTML to simplify diffing
 function normalize (html) {
@@ -28,4 +28,4 @@ const self = {
     }
 }
 
-export { self, test }
+module.exports = { self, test }

@@ -1,6 +1,6 @@
-import { parseFile, renderFile } from '..'
-import { self, test }            from './_helpers.js'
-import Nunjucks                  from 'nunjucks'
+const Nunjucks                  = require('nunjucks')
+const { parseFile, renderFile } = require('..')
+const { self, test }            = require('./_helpers.js')
 
 // ensure all descendants are reached (i.e. caching is disabled) by ensuring we
 // reach page-4 and page-5 in the following graph where page-3 loads page-4 the

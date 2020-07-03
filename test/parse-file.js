@@ -1,7 +1,7 @@
-import { parseFile }  from '..'
-import { self, test } from './_helpers.js'
-import Nunjucks       from 'nunjucks'
-import { sprintf }    from 'sprintf-js'
+const Nunjucks       = require('nunjucks')
+const { sprintf }    = require('sprintf-js')
+const { parseFile }  = require('..')
+const { self, test } = require('./_helpers.js')
 
 const templateDir = self.resolve('./example')
 const wantContent = self.read('./fixtures/content/example.html')

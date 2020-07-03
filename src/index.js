@@ -1,5 +1,5 @@
-const { Template } = require('nunjucks')
-const promisify    = require('pify')
+import { Template } from 'nunjucks'
+import promisify    from 'pify'
 
 // returns a wrapped version of Environment#getTemplate which appends the
 // dependencies discovered during the course of its thread of execution (which
@@ -84,7 +84,7 @@ function wrapGetTemplate (env, dependencies) {
 
 // a version of Environment#render which is (always) async and which
 // is passed the data via an options object
-async function renderFile (env, templatePath, _options) {
+export async function renderFile (env, templatePath, _options) {
     const options = _options || {}
     const getTemplate = promisify(env.getTemplate.bind(env))
     const template = await getTemplate(templatePath)
@@ -95,7 +95,7 @@ async function renderFile (env, templatePath, _options) {
 
 // a version of Environment#renderString which is (always) async and which
 // is passed the data and path via an options object
-function renderString (env, src, _options) {
+export function renderString (env, src, _options) {
     const options = _options || {}
     const template = new Template(src, env, options.path)
     const render = promisify(template.render.bind(template))
@@ -233,14 +233,12 @@ async function parse (env, render, pathOrSource, _options) {
 
 // an enhanced version of `renderFile` which augments its result with an array
 // of the template's dependencies
-function parseFile (env, templatePath, options) {
+export function parseFile (env, templatePath, options) {
     return parse(env, renderFile, templatePath, options)
 }
 
 // an enhanced version of `renderString` which augments its result with an array
 // of the template's dependencies
-function parseString (env, src, options) {
+export function parseString (env, src, options) {
     return parse(env, renderString, src, options)
 }
-
-module.exports = { parseFile, parseString, renderFile, renderString }

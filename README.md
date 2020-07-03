@@ -1,7 +1,7 @@
 # nunjucks-parser
 
-[![Build Status](https://secure.travis-ci.org/chocolateboy/nunjucks-parser.svg)](http://travis-ci.org/chocolateboy/nunjucks-parser)
-[![NPM Version](http://img.shields.io/npm/v/nunjucks-parser.svg)](https://www.npmjs.org/package/nunjucks-parser)
+[![Build Status](https://travis-ci.org/chocolateboy/nunjucks-parser.svg)](https://travis-ci.org/chocolateboy/nunjucks-parser)
+[![NPM Version](https://img.shields.io/npm/v/nunjucks-parser.svg)](https://www.npmjs.org/package/nunjucks-parser)
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
@@ -285,4 +285,4 @@ This package is tested and supported on environments which meet the following re
 Copyright © 2018-2019 by chocolateboy.
 
 This is free software; you can redistribute it and/or modify it under the
-terms of the [Artistic License 2.0](http://www.opensource.org/licenses/artistic-license-2.0.php).
+terms of the [Artistic License 2.0](https://www.opensource.org/licenses/artistic-license-2.0.php).

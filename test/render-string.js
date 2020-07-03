@@ -1,7 +1,7 @@
-import { renderString } from '..'
-import { self, test }   from './_helpers.js'
-import Nunjucks         from 'nunjucks'
-import { sprintf }      from 'sprintf-js'
+const Nunjucks         = require('nunjucks')
+const { sprintf }      = require('sprintf-js')
+const { renderString } = require('..')
+const { self, test }   = require('./_helpers.js')
 
 const templateDir = self.resolve('./example')
 const templatePath = `${templateDir}/layout.html`
