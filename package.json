@@ -11,7 +11,7 @@
         "build": "bili --map --format cjs -d dist src/index.js",
         "build:release": "cross-env NODE_ENV=production bili --no-map --format cjs,esm -d dist src/index.js",
         "clean": "shx rm -rf dist",
-        "doctoc": "markdown-toc --bullets=- --maxdepth 3 -i README.md",
+        "doctoc": "markdown-toc --bullets=- --maxdepth 2 -i README.md",
         "prepublishOnly": "run-s clean build:release test:run",
         "rebuild": "run-s clean build",
         "test": "run-s build test:run",
