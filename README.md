@@ -188,7 +188,7 @@ type Result = {
 
 ## parseFile
 
-**Signature**: parseFile(env: [Environment](https://mozilla.github.io/nunjucks/api.html#environment), templatePath: string, options?: Object) → Promise&lt;[Result](#result)&gt;<br/>
+- **Signature**: parseFile(env: [Environment](https://mozilla.github.io/nunjucks/api.html#environment), templatePath: string, options?: Object) → Promise&lt;[Result](#result)&gt;<br/>
 
 ```javascript
 const { content, dependencies } = await parseFile(env, templatePath, { data })
@@ -216,7 +216,7 @@ const deduped = uniqBy(dependencies, 'path')
 
 ## parseString
 
-**Signature**: parseString(env: [Environment](https://mozilla.github.io/nunjucks/api.html#environment), src: string, options?: Object) → Promise&lt;[Result](#result)&gt;<br />
+- **Signature**: parseString(env: [Environment](https://mozilla.github.io/nunjucks/api.html#environment), src: string, options?: Object) → Promise&lt;[Result](#result)&gt;<br />
 
 ```javascript
 const { content, dependencies } = await parseString(env, src, { data, path })
@@ -232,7 +232,7 @@ In addition to the options supported by [`parseFile`](#parsefile),
 
 ## renderFile
 
-**Signature**: renderFile(env: [Environment](https://mozilla.github.io/nunjucks/api.html#environment), templatePath: string, options?: Object) → Promise&lt;string&gt;
+- **Signature**: renderFile(env: [Environment](https://mozilla.github.io/nunjucks/api.html#environment), templatePath: string, options?: Object) → Promise&lt;string&gt;
 
 A version of
 [`Environment#render`](https://mozilla.github.io/nunjucks/api.html#render)
@@ -244,7 +244,7 @@ The following options are supported:
 
 ## renderString
 
-**Signature**: renderString(env: [Environment](https://mozilla.github.io/nunjucks/api.html#environment), src: string, options?: Object) → Promise&lt;string&gt;
+- **Signature**: renderString(env: [Environment](https://mozilla.github.io/nunjucks/api.html#environment), src: string, options?: Object) → Promise&lt;string&gt;
 
 A version of
 [`Environment#renderString`](https://mozilla.github.io/nunjucks/api.html#renderstring)
