@@ -1,3 +1,7 @@
+## 1.1.1 - TBD
+
+- update dependencies
+
 ## 1.1.0 - 2020-07-03
 
 - drop support for EOL Node.js v6

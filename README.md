@@ -3,11 +3,18 @@
 [![Build Status](https://travis-ci.org/chocolateboy/nunjucks-parser.svg)](https://travis-ci.org/chocolateboy/nunjucks-parser)
 [![NPM Version](https://img.shields.io/npm/v/nunjucks-parser.svg)](https://www.npmjs.org/package/nunjucks-parser)
 
-<!-- toc -->
+<!-- TOC -->
 
 - [NAME](#name)
 - [INSTALLATION](#installation)
 - [SYNOPSIS](#synopsis)
+  - [layout.html](#layouthtml)
+  - [header.html](#headerhtml)
+  - [footer.html](#footerhtml)
+  - [copyright.txt](#copyrighttxt)
+  - [example.js](#examplejs)
+  - [content](#content)
+  - [dependencies](#dependencies)
 - [DESCRIPTION](#description)
   - [Why?](#why)
   - [Why Not?](#why-not)
@@ -20,14 +27,13 @@
   - [renderFile](#renderfile)
   - [renderString](#renderstring)
 - [DEVELOPMENT](#development)
-  - [NPM Scripts](#npm-scripts)
 - [COMPATIBILITY](#compatibility)
 - [SEE ALSO](#see-also)
 - [VERSION](#version)
 - [AUTHOR](#author)
 - [COPYRIGHT AND LICENSE](#copyright-and-license)
 
-<!-- tocstop -->
+<!-- TOC END -->
 
 # NAME
 
@@ -260,14 +266,18 @@ In addition to the options supported by [`renderFile`](#renderfile),
 
 <details>
 
+<!-- TOC:ignore -->
 ## NPM Scripts
 
 The following NPM scripts are available:
 
-- build - compile a production build of the library and save it to the target directory
-- build:dev - compile a development build of the library and save it to the target directory
+- build - compile the library for testing and save to the target directory
+- build:doc - generate the README's TOC (table of contents)
+- build:release - compile the library for release and save to the target directory
 - clean - remove the target directory and its contents
-- test - compile the library and run the test suite
+- rebuild - clean the target directory and recompile the library
+- test - recompile the library and run the test suite
+- test:run - run the test suite
 
 </details>
 
