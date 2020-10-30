@@ -9,7 +9,7 @@
     "module": "dist/index.esm.js",
     "scripts": {
         "build": "bili --map --format cjs -d dist src/index.js",
-        "build:doc": "toc-md --max-depth 3 README.md",
+        "build:doc": "toc-md README.md",
         "build:release": "cross-env NODE_ENV=production bili --no-map --format cjs,esm -d dist src/index.js",
         "clean": "shx rm -rf dist",
         "prepublishOnly": "run-s clean build:release build:doc test:run",

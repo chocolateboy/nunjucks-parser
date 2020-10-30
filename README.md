@@ -8,13 +8,6 @@
 - [NAME](#name)
 - [INSTALLATION](#installation)
 - [SYNOPSIS](#synopsis)
-  - [layout.html](#layouthtml)
-  - [header.html](#headerhtml)
-  - [footer.html](#footerhtml)
-  - [copyright.txt](#copyrighttxt)
-  - [example.js](#examplejs)
-  - [content](#content)
-  - [dependencies](#dependencies)
 - [DESCRIPTION](#description)
   - [Why?](#why)
   - [Why Not?](#why-not)
@@ -46,6 +39,7 @@ nunjucks-parser - extract dependencies from nunjucks templates
 
 # SYNOPSIS
 
+<!-- TOC:ignore -->
 ### layout.html
 
 <details>
@@ -56,12 +50,14 @@ nunjucks-parser - extract dependencies from nunjucks templates
 {% include "components/footer.html" %}
 ```
 
+<!-- TOC:ignore -->
 ### header.html
 
 ```xml
 <h1>Header</h1>
 ```
 
+<!-- TOC:ignore -->
 ### footer.html
 
 ```jinja
@@ -69,6 +65,7 @@ nunjucks-parser - extract dependencies from nunjucks templates
 {% include "./copyright.txt" %}
 ```
 
+<!-- TOC:ignore -->
 ### copyright.txt
 
 ```
@@ -77,6 +74,7 @@ Copyright ⓒ example.com 2018
 
 </details>
 
+<!-- TOC:ignore -->
 ### example.js
 
 ```javascript
@@ -87,6 +85,7 @@ const env = nunjucks.configure('./example')
 const { content, dependencies } = await parseFile(env, 'layout.html')
 ```
 
+<!-- TOC:ignore -->
 ### content
 
 ```html
@@ -96,6 +95,7 @@ const { content, dependencies } = await parseFile(env, 'layout.html')
 Copyright ⓒ example.com 2018
 ```
 
+<!-- TOC:ignore -->
 ### dependencies
 
 ```javascript
