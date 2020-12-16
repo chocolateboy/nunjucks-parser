@@ -5,7 +5,7 @@ const Path           = require('path')
 
 // remove stray newlines from the rendered HTML to simplify diffing
 function normalize (html) {
-    return html.replace(/\n{2,}/g, "\n")
+    return html.replace(/(?:\r?\n)+/g, '\n')
 }
 
 // XXX temporary hack to add methods to AVA's `t` object until official support
@@ -20,7 +20,8 @@ Object.assign(Assertions.prototype, {
 const self = {
     read (path) {
         const resolved = this.resolve(path)
-        return Fs.readFileSync(resolved, 'utf8')
+        const content = Fs.readFileSync(resolved, 'utf8')
+        return content.replace(/\r\n/g, '\n')
     },
 
     resolve (path) {

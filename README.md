@@ -1,6 +1,6 @@
 # nunjucks-parser
 
-[![Build Status](https://travis-ci.org/chocolateboy/nunjucks-parser.svg)](https://travis-ci.org/chocolateboy/nunjucks-parser)
+[![Build Status](https://github.com/chocolateboy/nunjucks-parser/workflows/test/badge.svg)](https://github.com/chocolateboy/nunjucks-parser/actions?query=workflow%3Atest)
 [![NPM Version](https://img.shields.io/npm/v/nunjucks-parser.svg)](https://www.npmjs.org/package/nunjucks-parser)
 
 <!-- TOC -->

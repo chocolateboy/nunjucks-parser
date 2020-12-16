@@ -1,10 +1,11 @@
 const Nunjucks        = require('nunjucks')
+const Path            = require('path')
 const { sprintf }     = require('sprintf-js')
 const { parseString } = require('..')
 const { self, test }  = require('./_helpers.js')
 
 const templateDir = self.resolve('./example')
-const templatePath = `${templateDir}/layout.html`
+const templatePath = Path.join(templateDir, 'layout.html')
 const template = self.read(templatePath)
 const wantContent = self.read('./fixtures/content/example.html')
 const stringNoPathDependencies = require('./fixtures/dependencies/string-without-path.js')(templateDir)

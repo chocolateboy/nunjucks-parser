@@ -1,22 +1,24 @@
+const Path = require('path')
+
 module.exports = templateDir => [
     {
         name: 'layout.html',
-        path: `${templateDir}/layout.html`,
+        path: Path.join(templateDir, 'layout.html'),
         parent: null
     },
     {
         name: 'components/header.html',
-        path: `${templateDir}/components/header.html`,
-        parent: `${templateDir}/layout.html`
+        path: Path.join(templateDir, 'components/header.html'),
+        parent: Path.join(templateDir, 'layout.html'),
     },
     {
         name: 'components/footer.html',
-        path: `${templateDir}/components/footer.html`,
-        parent: `${templateDir}/layout.html`
+        path: Path.join(templateDir, 'components/footer.html'),
+        parent: Path.join(templateDir, 'layout.html'),
     },
     {
         name: './copyright.txt',
-        path: `${templateDir}/components/copyright.txt`,
-        parent: `${templateDir}/components/footer.html`
+        path: Path.join(templateDir, 'components/copyright.txt'),
+        parent: Path.join(templateDir, 'components/footer.html'),
     }
 ]
