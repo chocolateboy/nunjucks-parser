@@ -194,7 +194,7 @@ type Result = {
 
 ## parseFile
 
-- **Signature**: parseFile(env: [Environment](https://mozilla.github.io/nunjucks/api.html#environment), templatePath: string, options?: Object) → Promise&lt;[Result](#result)&gt;<br/>
+- **Signature**: parseFile (env: [Environment][], templatePath: string, options?: Options) ⇒ Promise&lt;[Result](#result)&gt;
 
 ```javascript
 const { content, dependencies } = await parseFile(env, templatePath, { data })
@@ -205,14 +205,14 @@ dependencies as well as its rendered content.
 
 The following options are supported:
 
-- data (Object): an optional value to expose as the template's "context"
+- data (object): an optional value to expose as the template's "context"
 
 Dependencies are returned in the order in which they're traversed (depth
 first), and all descendants are returned, including those that are loaded
 dynamically.
 
 If deduplicated dependencies are needed, they can be distinguished by the
-`path` property e.g.:
+`path` property, e.g.:
 
 ```javascript
 import { uniqBy } from 'lodash'
@@ -222,7 +222,7 @@ const deduped = uniqBy(dependencies, 'path')
 
 ## parseString
 
-- **Signature**: parseString(env: [Environment](https://mozilla.github.io/nunjucks/api.html#environment), src: string, options?: Object) → Promise&lt;[Result](#result)&gt;<br />
+- **Signature**: parseString (env: [Environment][], src: string, options?: Options) ⇒ Promise&lt;[Result](#result)&gt;
 
 ```javascript
 const { content, dependencies } = await parseString(env, src, { data, path })
@@ -238,7 +238,7 @@ In addition to the options supported by [`parseFile`](#parsefile),
 
 ## renderFile
 
-- **Signature**: renderFile(env: [Environment](https://mozilla.github.io/nunjucks/api.html#environment), templatePath: string, options?: Object) → Promise&lt;string&gt;
+- **Signature**: renderFile (env: [Environment][], templatePath: string, options?: Options) ⇒ Promise&lt;string&gt;
 
 A version of
 [`Environment#render`](https://mozilla.github.io/nunjucks/api.html#render)
@@ -246,11 +246,11 @@ which is (always) async and which is passed its context via an options object.
 
 The following options are supported:
 
-- data (Object): an optional value to expose as the template's "context"
+- data (object): an optional value to expose as the template's "context"
 
 ## renderString
 
-- **Signature**: renderString(env: [Environment](https://mozilla.github.io/nunjucks/api.html#environment), src: string, options?: Object) → Promise&lt;string&gt;
+- **Signature**: renderString (env: [Environment][], src: string, options?: Options) ⇒ Promise&lt;string&gt;
 
 A version of
 [`Environment#renderString`](https://mozilla.github.io/nunjucks/api.html#renderstring)
@@ -309,3 +309,5 @@ Copyright © 2018-2020 by chocolateboy.
 
 This is free software; you can redistribute it and/or modify it under the
 terms of the [Artistic License 2.0](https://www.opensource.org/licenses/artistic-license-2.0.php).
+
+[Environment]: https://mozilla.github.io/nunjucks/api.html#environment
